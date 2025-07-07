@@ -1,0 +1,646 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Upload Form Styles */
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .upload-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .upload-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .upload-header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .upload-form {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        color: #667eea;
+    }
+
+    /* File Upload Area */
+    .file-upload-area {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: #f9fafb;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .file-upload-area:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+    }
+
+    .file-upload-area.drag-over {
+        border-color: #667eea;
+        background: #e0e7ff;
+        transform: scale(1.02);
+    }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #9ca3af;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload-area:hover .upload-icon {
+        color: #667eea;
+        transform: scale(1.1);
+    }
+
+    .upload-text {
+        color: #4b5563;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .upload-subtext {
+        color: #9ca3af;
+        font-size: 0.9rem;
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* Form Fields */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .form-label.required::after {
+        content: " *";
+        color: #ef4444;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Form Grid */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    /* File Preview */
+    .file-preview {
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 15px;
+        display: none;
+    }
+
+    .file-preview.active {
+        display: block;
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .file-icon {
+        font-size: 2rem;
+        color: #ef4444;
+    }
+
+    .file-details h4 {
+        margin: 0 0 4px 0;
+        color: #374151;
+    }
+
+    .file-details p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .remove-file {
+        margin-left: auto;
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .remove-file:hover {
+        background: #fecaca;
+    }
+
+    /* Submit Button */
+    .submit-section {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        padding: 14px 32px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Progress Bar */
+    .upload-progress {
+        display: none;
+        margin-top: 20px;
+    }
+
+    .progress-bar {
+        background: #e5e7eb;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        text-align: center;
+        margin-top: 10px;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .upload-form {
+            padding: 30px 20px;
+        }
+
+        .upload-header h1 {
+            font-size: 2rem;
+        }
+
+        .file-upload-area {
+            padding: 30px 15px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="upload-container">
+    <div class="upload-header">
+        <h1><i class="fas fa-file-pdf"></i> Upload PDF Document</h1>
+        <p>Generate AI-powered quizzes from your PDF documents</p>
+    </div>
+
+    <form class="upload-form" method="post" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+        
+        <!-- File Upload Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Select PDF File
+            </div>
+            
+            <div class="file-upload-area" id="fileUploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="upload-text">
+                    Drop your PDF file here or click to browse
+                </div>
+                <div class="upload-subtext">
+                    Maximum file size: 10MB | Supported format: PDF only
+                </div>
+                <input type="file" name="pdf_file" class="file-input" id="fileInput" accept=".pdf" required>
+            </div>
+
+            <div class="file-preview" id="filePreview">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="file-details">
+                        <h4 id="fileName">Document.pdf</h4>
+                        <p id="fileSize">0 MB</p>
+                    </div>
+                    <button type="button" class="remove-file" id="removeFile">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="upload-progress" id="uploadProgress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Uploading... 0%</div>
+            </div>
+        </div>
+
+        <!-- Quiz Configuration Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                Quiz Configuration
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="quiz_title" class="form-label required">Quiz Title</label>
+                    <input type="text" name="quiz_title" id="quiz_title" class="form-input" 
+                           placeholder="Enter quiz title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject" class="form-label">Subject</label>
+                    <select name="subject" id="subject" class="form-select">
+                        <option value="">Select Subject</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="history">History</option>
+                        <option value="literature">Literature</option>
+                        <option value="computer_science">Computer Science</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulty_level" class="form-label">Difficulty Level</label>
+                    <select name="difficulty_level" id="difficulty_level" class="form-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="num_questions" class="form-label">Number of Questions</label>
+                    <select name="num_questions" id="num_questions" class="form-select">
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                        <option value="15">15 Questions</option>
+                        <option value="20">20 Questions</option>
+                        <option value="25">25 Questions</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">Description (Optional)</label>
+                <textarea name="description" id="description" class="form-input form-textarea" 
+                          placeholder="Brief description of the quiz content..."></textarea>
+            </div>
+        </div>
+
+        <!-- Question Types Section -->
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-question-circle"></i>
+                Question Types
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="question_types" value="multiple_choice" checked style="margin-right: 8px;">
+                        Multiple Choice
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="question_types" value="true_false" style="margin-right: 8px;">
+                        True/False
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="question_types" value="short_answer" style="margin-right: 8px;">
+                        Short Answer
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="question_types" value="fill_blank" style="margin-right: 8px;">
+                        Fill in the Blank
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Section -->
+        <div class="submit-section">
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-magic"></i>
+                Generate Quiz from PDF
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadForm = document.getElementById('uploadForm');
+
+    // File upload area click
+    fileUploadArea.addEventListener('click', () => {
+       //fileInput.click();
+    });
+
+    // Drag and drop events
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('drag-over');
+    });
+
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('drag-over');
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelection(files[0]);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelection(e.target.files[0]);
+        }
+    });
+
+    // Remove file
+    removeFile.addEventListener('click', () => {
+        fileInput.value = '';
+        filePreview.classList.remove('active');
+        fileUploadArea.style.display = 'block';
+        submitBtn.disabled = false;
+    });
+
+    // Handle file selection
+    function handleFileSelection(file) {
+        if (file.type !== 'application/pdf') {
+            showToast('Please select a PDF file only.', 'error');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) { // 10MB
+            showToast('File size must be less than 10MB.', 'error');
+            return;
+        }
+
+        fileName.textContent = file.name;
+        fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        filePreview.classList.add('active');
+        fileUploadArea.style.display = 'none';
+    }
+
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!fileInput.files.length) {
+            showToast('Please select a PDF file.', 'error');
+            return;
+        }
+
+        // Show progress
+        uploadProgress.style.display = 'block';
+        //submitBtn.disabled = true;
+
+        // Simulate upload progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            progressFill.style.width = progress + '%';
+            progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+        }, 200);
+
+        // Create FormData and submit
+        const formData = new FormData(uploadForm);
+        fetch('/create-quiz',{
+            method:'POST',
+            body:formData,
+            header:{
+                'X-Requested-With':'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+          clearInterval(progressInterval);
+          console.log(response)
+          if(!response.ok){
+            throw new Error(`HTTP 12 error! status:${response.status}`)
+          }
+          return response.json()
+        })
+        .then(data=> {
+            progressFill.style.width = '100%';
+            progressText.textContent = 'Processing PDF and Generating quiz..';
+
+            setTimeout(() => {
+                if (data.success){
+                    showToast(data.message || 'Quize generated successfully!', 'success');
+
+                    // Reset form after success
+                    setTimeout(()=>{
+                        if(data.redirect_url){
+                            window.location.href=data.redirect_url;
+                        }//else{
+                           // resetForm();
+                        //}
+
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'Faild to generate quiz')
+                }
+            }, 1500);
+        })
+
+        .catch(error => {
+            clearInterval(progressInterval);
+            console.log('ERROR: ', error)
+            showToast(error.message|| 'An error accured while processing your request','error' );
+            //resetFormState();
+        });
+
+
+
+        // Here you would typically send the form data to your server
+        // For demo purposes, we'll simulate a successful upload
+        setTimeout(() => {
+
+            clearInterval(progressInterval);
+            progressFill.style.width = '100%';
+            progressText.textContent = 'Processing PDF and generating quiz...';
+            
+            setTimeout(() => {
+                showToast('Quiz generated successfully!', 'success');
+                // Redirect or handle success
+                // window.location.href = '/quiz/success/';
+            }, 2000);
+        }, 3000);
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

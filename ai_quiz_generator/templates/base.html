@@ -35,11 +35,11 @@
             
             <div class="nav-menu">
                 <div class="nav-links">
-                    <a href="#dashboard" class="nav-link">
+                    <a href="{% url 'quiz:home' %}" class="nav-link">
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </a>
-                    <a href="#create" class="nav-link">
+                    <a href="{% url 'quiz:create-quiz' %}" class="nav-link">
                         <i class="fas fa-plus-circle"></i>
                         Create Quiz
                     </a>
@@ -87,10 +87,7 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Content will go here -->
-        <div class="content-wrapper">
-            <h1>Welcome to AI Quiz Generator</h1>
-            <p>Smart Learning, Smarter Questions</p>
-        </div>
+        
         {% block content %} {% endblock %}
     </main>
 

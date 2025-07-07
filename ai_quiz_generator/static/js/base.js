@@ -290,6 +290,23 @@ function testToasts() {
     setTimeout(() => showToast('Warning: Please check your input.', 'warning'), 2000);
     setTimeout(() => showToast('Error: Something went wrong.', 'error'), 3000);
 }
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+    document.getElementById('toast-container').appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
 
 // Expose utilities globally
 window.QuizAI = {
